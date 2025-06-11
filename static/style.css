@@ -1,0 +1,112 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  text-align: center;
+}
+
+#map {
+  height: 100vh;
+  width: 100%;
+}
+
+/* Panel de información flotante */
+#info {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background-color: rgba(0, 0, 0, 0.5); /* semi-transparente */
+  border-radius: 10px;
+  box-shadow: 0 3px 8px rgba(255, 255, 255, 0.15);
+  padding: 0.8em;
+  max-width: 280px;
+  max-height: 80vh; /* límite vertical */
+  overflow-y: auto; /* scroll interno */
+  z-index: 1000;
+  text-align: left;
+  font-size: 12.5px;
+  color: #ffffff;
+  backdrop-filter: blur(4px); /* efecto moderno */
+}
+
+/* Scroll personalizado (opcional) */
+#info::-webkit-scrollbar {
+  width: 8px;
+}
+
+#info::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+}
+
+#info::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Encabezado del panel */
+#info p {
+  margin-top: 0;
+  font-weight: 500;
+}
+
+/* Select y botones */
+#info select,
+#info button {
+  margin-top: 0.4em;
+  margin-bottom: 0.6em;
+  padding: 6px 8px;
+  width: 100%;
+  font-size: 12.5px;
+  border-radius: 5px;
+  border: 1px solid #000000;
+  background-color: white;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+#info button:disabled {
+  background-color: #ddd;
+  cursor: not-allowed;
+}
+
+#info button:hover:not(:disabled) {
+  background-color: #e0e0e0;
+}
+
+/* Contenedor de los datos del origen/destino */
+#datosPuntos {
+  margin-top: 0.8em;
+}
+
+#datosPuntos div {
+  margin-bottom: 0.8em;
+  border-top: 1px solid #ccc;
+  padding-top: 0.5em;
+}
+
+/* Botón especial para reiniciar búsqueda */
+#btnReset {
+  margin-top: 1em;
+  width: 100%;
+  background-color: #d9534f;
+  color: black;
+  font-weight: bold;
+  border: none;
+}
+
+#btnReset:hover {
+  background-color: #c9302c;
+}
+
+/* Estilo para barra de búsqueda Leaflet GeoSearch */
+.leaflet-control-geosearch {
+  z-index: 1000;
+  max-width: 400px;
+  margin-top: 10px;
+}
+
+.leaflet-control-geosearch input {
+  padding: 6px;
+  border-radius: 5px;
+  border: 1px solid #aaa;
+  font-size: 12.5px;
+}

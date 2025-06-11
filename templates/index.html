@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Rutas: Dijkstra + Manhattan Dinámico</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-geosearch@3.11.0/dist/geosearch.css"/>
+    <link rel="stylesheet" href="/static/style.css"/>
+</head>
+<body>
+  <div id="map"></div>
+  <div id="info">
+    <p>Selecciona transporte, luego origen y destino (mapa o búsqueda)</p>
+    <label for="transporte">Modo de transporte:</label>
+    <select id="transporte">
+      <option value="" disabled selected>Elija una opción</option>
+      <option value="auto">Auto</option>
+      <option value="bici">Bicicleta</option>
+      <option value="peaton">Caminando</option>
+    </select><br/><br/>
+    <button id="btnOrigen" disabled>Seleccionar Origen</button>
+    <button id="btnDestino" disabled>Seleccionar Destino</button><br/><br/>
+    <div id="datosPuntos"></div>
+  </div>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-geosearch@3.11.0/dist/bundle.min.js"></script>
+  <script src="/static/script.js"></script>
+</body>
+</html>
