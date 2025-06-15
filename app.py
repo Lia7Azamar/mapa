@@ -72,7 +72,7 @@ def validar_ruta_por_segmentos_ortogonales(ruta_osrm_latlng, tolerancia_grados_s
     return True
 
 # Esta función es para verificar la tendencia principal de los dos tramos de la "L"
-def es_ortogonal_tendencia_principal(p1, p2, tolerancia_grados_tendencia=1):
+def es_ortogonal_tendencia_principal(p1, p2, tolerancia_grados_tendencia=10):
     """
     Verifica si la línea recta entre dos puntos es aproximadamente ortogonal.
     Esto es para la intención general del tramo, no para cada segmento.
