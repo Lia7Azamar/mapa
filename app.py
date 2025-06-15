@@ -14,14 +14,14 @@ class Config:
     
     # Tolerancia para la tendencia principal de los segmentos de la 'L' de Manhattan (Origen-Intermedio, Intermedio-Destino).
     # Un valor más alto permite que la 'L' sea menos "perfecta" geométricamente.
-    # Recomendado: 10 a 25 grados.
-    TOLERANCIA_MANHATTAN_TENDENCIA_PRINCIPAL_GRADOS = 20 
+    # Recomendado: 10 a 30 grados.
+    TOLERANCIA_MANHATTAN_TENDENCIA_PRINCIPAL_GRADOS = 25 # Ajustado para mayor flexibilidad en la forma general
     
-    # Tolerancia para la "rectitud" de CADA pequeño segmento de calle obtenido de OSRM.
-    # Un valor más alto permite que las calles individuales se curven más y aún sean consideradas "ortogonales".
+    # Este es el valor MÁS IMPORTANTE a ajustar para que se encuentre la ruta Manhattan.
+    # Si lo aumentas, permitirás que los segmentos de calle se curven MÁS y aún sean consideradas "ortogonales".
     # Este es el valor más crítico para la flexibilidad visual de la ruta Manhattan.
     # Recomendado: 5 a 15 grados.
-    TOLERANCIA_MANHATTAN_SEGMENTO_GRADOS = 8 
+    TOLERANCIA_MANHATTAN_SEGMENTO_GRADOS = 12 # Ajustado para mayor flexibilidad en la rectitud de las calles
 
 app.config.from_object(Config)
 
@@ -179,6 +179,11 @@ def ruta():
             (origen, punto_intermedio_v_h, destino)
         ]
         
+        # Para futuras mejoras de flexibilidad: Aquí se podrían añadir más puntos intermedios
+        # en una pequeña cuadrícula alrededor de los puntos_intermedios_h_v y _v_h
+        # para explorar más opciones si la red vial no es perfectamente cuadriculada.
+        # Sin embargo, esto aumenta significativamente el número de llamadas a OSRM.
+
         for p_start, p_intermedio, p_end in candidatos_l_shape:
             try:
                 # 1. Validar la tendencia principal de la "L" geométrica (ej. Origen a Esquina, y Esquina a Destino)
@@ -195,7 +200,7 @@ def ruta():
                 ruta2_osrm, dist2_osrm, dur2_osrm = pedir_ruta_osrm(p_intermedio, p_end, perfil)
                 
                 # 3. Validar si CADA SEGMENTO de las rutas OSRM obtenidas es suficientemente recto/ortogonal.
-                # Esta es la validación que asegura que las calles de la ruta no se curven demasiado.
+                # Esta es la validación que asegura que las calles de la ruta no se curvan demasiado.
                 if not validar_ruta_por_segmentos_ortogonales(ruta1_osrm, 
                                                               tolerancia_grados_segmento=app.config['TOLERANCIA_MANHATTAN_SEGMENTO_GRADOS']) or \
                    not validar_ruta_por_segmentos_ortogonales(ruta2_osrm, 
@@ -208,12 +213,12 @@ def ruta():
                 distancia_total_actual = dist1_osrm + dist2_osrm
                 duracion_total_actual = dur1_osrm + dur2_osrm
                 
-                # Si es la mejor ruta Manhattan encontrada hasta ahora, la guardamos
-                if distancia_total_actual < mejor_dist_manhattan:
-                    mejor_ruta_manhattan = ruta_manhattan_actual
-                    mejor_dist_manhattan = distancia_total_actual
-                    mejor_dur_manhattan = duracion_total_actual
-                    mensaje_manhattan = f"Ruta Manhattan encontrada (distancia: {round(mejor_dist_manhattan, 2)}m)."
+                # Si es la mejor ruta Manhattan encontrada hasta ahora (la más corta), la guardamos
+                if distancia_total_actual < distancia_manhattan:
+                    ruta_manhattan_coords = ruta_manhattan_actual
+                    distancia_manhattan = distancia_total_actual
+                    duracion_manhattan = duracion_total_actual
+                    mensaje_manhattan = f"Ruta Manhattan encontrada (distancia: {round(distancia_manhattan, 2)}m)."
 
             except Exception as e:
                 # print(f"DEBUG: Error al procesar candidato Manhattan para p_intermedio {p_intermedio}: {e}. Saltando.")
@@ -226,7 +231,7 @@ def ruta():
         'distancia_metros': round(distancia_normal, 2),
         'tiempo_segundos': round(duracion_normal, 2),
         'mensaje': mensaje_normal,
-        'ruta_manhattan': ruta_manhattan_coords, # Vacío si no se encontró
+        'ruta_manhattan': ruta_manhattan_coords, # Estará vacía si no se encontró
         'distancia_manhattan_metros': round(distancia_manhattan, 2) if distancia_manhattan != float('inf') else None,
         'tiempo_manhattan_segundos': round(duracion_manhattan, 2) if duracion_manhattan != float('inf') else None,
         'mensaje_manhattan': mensaje_manhattan
@@ -234,7 +239,8 @@ def ruta():
 
     # Si ninguna ruta (normal o manhattan) pudo ser calculada, podemos devolver un error HTTP
     if not ruta_normal_coords and not ruta_manhattan_coords:
-         return jsonify(response_data), 500
+         # Considera un código de estado 404 o 500 dependiendo de si la ausencia de ruta es esperada
+         return jsonify(response_data), 404 
          
     return jsonify(response_data)
 
